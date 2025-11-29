@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Snake Game</title>
+<style>
+  body {
+    margin: 0;
+    background: #111;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: white;
+    font-family: Arial, sans-serif;
+  }
+  #gameBox {
+    border: 3px solid #0f0;
+    background: #000;
+  }
+  h1 {
+    font-size: 24px;
+    margin-top: -550px;
+    text-shadow: 0 0 10px lime;
+  }
+</style>
+</head>
+<body>
+
+<h1>🐍 SNAKE GAME</h1>
+<canvas id="gameBox" width="400" height="400"></canvas>
+
+<script>
+const canvas = document.getElementById("gameBox");
+const ctx = canvas.getContext("2d");
+
+let box = 20;
+let snake = [{ x: 9 * box, y: 10 * box }];
+let direction = "";
+let food = {
+  x: Math.floor(Math.random() * 19 + 1) * box,
+  y: Math.floor(Math.random() * 19 + 1) * box
+};
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
+  else if (e.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
+  else if (e.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
+  else if (e.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
+});
+
+function draw() {
+  ctx.clearRect(0, 0, 400, 400);
+
+  ctx.fillStyle = "red";
+  ctx.fillRect(food.x, food.y, box, box);
+
+  for (let i = 0; i < snake.length; i++) {
+    ctx.fillStyle = i === 0 ? "lime" : "#0aff0a";
+    ctx.fillRect(snake[i].x, snake[i].y, box, box);
+  }
+
+  let snakeX = snake[0].x;
+  let snakeY = snake[0].y;
+
+  if (direction === "UP") snakeY -= box;
+  if (direction === "DOWN") snakeY += box;
+  if (direction === "LEFT") snakeX -= box;
+  if (direction === "RIGHT") snakeX += box;
+
+  if (snakeX === food.x && snakeY === food.y) {
+    food = {
+      x: Math.floor(Math.random() * 19 + 1) * box,
+      y: Math.floor(Math.random() * 19 + 1) * box
+    };
+  } else {
+    snake.pop();
+  }
+
+  let newHead = { x: snakeX, y: snakeY };
+
+  if (
+    snakeX < 0 || snakeX >= 400 ||
+    snakeY < 0 || snakeY >= 400 ||
+    collision(newHead, snake)
+  ) {
+    alert("Game Over!");
+    document.location.reload();
+  }
+
+  snake.unshift(newHead);
+}
+
+function collision(head, array) {
+  return array.some(a => a.x === head.x && a.y === head.y);
+}
+
+setInterval(draw, 100);
+</script>
+
+</body>
+</html>
